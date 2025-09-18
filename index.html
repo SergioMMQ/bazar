@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>7 LUNAS BAZAR</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">7LB</div>
+      <div>
+        <h1>7 LUNAS BAZAR</h1>
+        <div class="muted">De lo vintage a lo artesanal</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="search" role="search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="margin-right:8px"><path d="M21 21l-4.35-4.35" stroke="#94a3b8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11" cy="11" r="6" stroke="#94a3b8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <input id="q" type="search" placeholder="Buscar productos, categorías..." />
+      </div>
+
+      <select id="category" class="select">
+        <option value="">Todas las categorías</option>
+        <option>Ropa</option>
+        <option>Cosmetica Natural</option>
+        <option>Vintage</option>
+        <option>Artesanía</option>
+        <option>Accesorios</option>
+        <option>zapatos</option>
+        <option>Otros</option>
+      </select>
+
+    </div>
+  </header>
+
+  <main>
+    <div class="toolbar">
+      <div class="filters">
+        <div class="muted" style="margin-left:8px">Mostrando <span id="count">--</span> productos</div>
+      </div>
+      <div class="muted">Ordenar por:
+        <select id="sort">
+          <option value="relevancia">Relevancia</option>
+          <option value="precio-asc">Precio: bajo a alto</option>
+          <option value="precio-desc">Precio: alto a bajo</option>
+        </select>
+      </div>
+    </div>
+
+    <section class="products-grid" id="grid">
+      <!-- Cards se generan por JavaScript -->
+    </section>
+
+    <div style="height:28px"></div>
+
+    <div style="display:flex;gap:12px;align-items:center;justify-content:center;margin-top:24px">
+      <button class="btn-ghost">Ver más</button>
+      <button class="btn-ghost">Contacto</button>
+    </div>
+  </main>
+
+  <footer>
+    © <span id="year"></span> Alameda Marketplace · Demo
+  </footer>
+
+  <!-- Modal detalle -->
+  <div id="modal" class="modal" role="dialog" aria-hidden="true">
+    <div class="modal-card">
+      <h3 id="m-title">Título</h3>
+      <p id="m-desc">Descripción</p>
+      <div style="display:flex;justify-content:space-between;margin-top:12px;align-items:center">
+        <div class="price" id="m-price">$0.00</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-ghost" id="m-close">Cerrar</button>
+          <button class="chip" id="m-buy">Comprar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* Demo: datos estáticos. Reemplaza con llamadas a tu API/Firebase */
+    const products = [
+      {id:1,title:'Lámpara vintage',desc:'Lámpara de mesa con diseño retro',price:1250,cat:'Hogar',tag:'nuevo',img:''},
+      {id:2,title:'Playera algodón',desc:'Playera 100% algodón talla M',price:299,cat:'Ropa',tag:'usado',img:''},
+      {id:3,title:'Audífonos inalámbricos',desc:'Bluetooth, ANC, 20h de batería',price:1899,cat:'Electrónica',tag:'nuevo',img:''},
+      {id:4,title:'Mesa de madera',desc:'Mesa auxiliar de pino',price:2200,cat:'Hogar',tag:'usado',img:''},
+      {id:5,title:'Collar artesanal',desc:'Hecho a mano, piezas de cerámica',price:450,cat:'Artesanía',tag:'nuevo',img:''},
+      {id:6,title:'Silla plegable',desc:'Práctica y ligera',price:650,cat:'Hogar',tag:'nuevo',img:''},
+      {id:7,title:'Chaqueta de mezclilla',desc:'Talla L, buen estado',price:720,cat:'Ropa',tag:'usado',img:''},
+      {id:8,title:'Juego de tazas',desc:'Cerámica, set de 4',price:340,cat:'Hogar',tag:'nuevo',img:''}
+    ];
+
+    const grid = document.getElementById('grid');
+    const countEl = document.getElementById('count');
+    const year = document.getElementById('year'); year.textContent = new Date().getFullYear();
+
+    function formatMoney(n){return n.toLocaleString('es-MX',{style:'currency',currency:'MXN'})}
+
+    function render(list){
+      grid.innerHTML = '';
+      list.forEach(p => {
+        const card = document.createElement('article');
+        card.className = 'card';
+        card.innerHTML = `
+          <div class="media">${p.img ? `<img src="${p.img}" alt="${p.title}" style="max-width:100%;max-height:100%"/>` : '<svg width="42" height="42" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="#c7d2fe" stroke-width="1.6"/><path d="M7 14h10" stroke="#c7d2fe" stroke-width="1.2" stroke-linecap="round"/></svg>'}
+          </div>
+          <div class="meta">
+            <div style="display:flex;justify-content:space-between;align-items:start">
+              <div style="flex:1">
+                <h3 class="title">${p.title}</h3>
+                <p class="desc">${p.desc}</p>
+              </div>
+              <div style="margin-left:8px;text-align:right">
+                <div class="badge">${p.tag}</div>
+              </div>
+            </div>
+            <div class="price-row">
+              <div class="price">${formatMoney(p.price)}</div>
+              <div class="actions">
+                <button class="btn-ghost" data-id="${p.id}" aria-label="Ver">Ver</button>
+                <button class="chip" data-buy="${p.id}">Comprar</button>
+              </div>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      countEl.textContent = list.length;
+    }
+
+    // initial render
+    render(products);
+
+    // search / filters
+    const q = document.getElementById('q');
+    const category = document.getElementById('category');
+    const chips = document.querySelectorAll('.chip[data-filter]');
+    const sort = document.getElementById('sort');
+
+    function getActiveFilters(){
+      const active = Array.from(chips).filter(c => c.classList.contains('active')).map(c=>c.dataset.filter);
+      return active;
+    }
+
+    document.addEventListener('click', e => {
+      if(e.target.matches('.chip[data-filter]')){
+        e.target.classList.toggle('active');
+        applyFilters();
+      }
+      if(e.target.matches('.btn-ghost[data-id]')){
+        const id = Number(e.target.dataset.id);
+        openModal(products.find(p=>p.id===id));
+      }
+      if(e.target.matches('[data-buy]')){
+        const id = Number(e.target.dataset.buy);
+        alert('Simulación: producto agregado al carrito -> ' + id);
+      }
+    });
+
+    q.addEventListener('input', applyFilters);
+    category.addEventListener('change', applyFilters);
+    sort.addEventListener('change', applyFilters);
+
+    function applyFilters(){
+      const term = q.value.trim().toLowerCase();
+      const cat = category.value;
+      const active = getActiveFilters();
+      let out = products.filter(p=>{
+        if(cat && p.cat !== cat) return false;
+        if(active.length && !active.includes(p.tag)) return false;
+        if(term){
+          return p.title.toLowerCase().includes(term) || p.desc.toLowerCase().includes(term) || p.cat.toLowerCase().includes(term);
+        }
+        return true;
+      });
+
+      if(sort.value === 'precio-asc') out = out.sort((a,b)=>a.price-b.price);
+      if(sort.value === 'precio-desc') out = out.sort((a,b)=>b.price-a.price);
+
+      render(out);
+    }
+
+    // layout controls: Auto / 3 cols / 4 cols
+    const layoutAuto = document.getElementById('layoutAuto');
+    const layout3 = document.getElementById('layout3');
+    const layout4 = document.getElementById('layout4');
+
+    function clearLayoutActive(){[layoutAuto,layout3,layout4].forEach(el=>el.classList.remove('active'))}
+
+    layoutAuto.addEventListener('click', ()=>{
+      clearLayoutActive(); layoutAuto.classList.add('active');
+      grid.style.gridTemplateColumns = '';
+    });
+    layout3.addEventListener('click', ()=>{
+      clearLayoutActive(); layout3.classList.add('active');
+      grid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+    });
+    layout4.addEventListener('click', ()=>{
+      clearLayoutActive(); layout4.classList.add('active');
+      grid.style.gridTemplateColumns = 'repeat(4, 1fr)';
+    });
+
+    // modal
+    const modal = document.getElementById('modal');
+    const mTitle = document.getElementById('m-title');
+    const mDesc = document.getElementById('m-desc');
+    const mPrice = document.getElementById('m-price');
+    const mClose = document.getElementById('m-close');
+
+    function openModal(p){
+      if(!p) return;
+      mTitle.textContent = p.title;
+      mDesc.textContent = p.desc;
+      mPrice.textContent = formatMoney(p.price);
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden','false');
+    }
+    function closeModal(){ modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); }
+    mClose.addEventListener('click', closeModal);
+    modal.addEventListener('click', e=>{ if(e.target===modal) closeModal(); });
+
+    // initialize default layout state
+    layoutAuto.classList.add('active');
+
+  </script>
+</body>
+</html>

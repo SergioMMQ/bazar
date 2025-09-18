@@ -1,0 +1,72 @@
+
+    :root{
+      --accent:#0ea5a4;
+      --card-bg: #ffffff;
+      --muted:#6b7280;
+      --shadow: 0 6px 18px rgba(19, 24, 33, 0.08);
+      --radius: 12px;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:#f6f7fb;color:#0f172a}
+
+    header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;background:linear-gradient(90deg,#fff 0,#f8fafc 100%);border-bottom:1px solid #e6e9ef}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#60a5fa);display:flex;align-items:center;justify-content:center;color:white;font-weight:700}
+    h1{font-size:18px;margin:0}
+    .controls{display:flex;gap:12px;align-items:center}
+    .search{display:flex;align-items:center;background:#fff;padding:8px 12px;border-radius:999px;box-shadow:var(--shadow);min-width:220px}
+    .search input{border:0;outline:none;font-size:14px}
+    .select, .btn{background:#fff;border:0;padding:8px 12px;border-radius:10px;box-shadow:var(--shadow);cursor:pointer}
+
+    main{padding:24px}
+    .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:12px}
+    .filters{display:flex;gap:8px;align-items:center}
+    .chips{display:flex;gap:8px}
+    .chip{padding:8px 12px;border-radius:999px;background:#fff;box-shadow:var(--shadow);cursor:pointer}
+
+    /* Grid */
+    .products-grid{
+      display:grid;
+      gap:18px;
+      /* default: responsive columns using auto-fit */
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    /* Card */
+    .card{background:var(--card-bg);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
+    .media{height:180px;background:linear-gradient(180deg,#eef2ff,#f8fafc);display:flex;align-items:center;justify-content:center;color:var(--muted);font-weight:600}
+    .meta{padding:14px;display:flex;flex-direction:column;gap:8px}
+    .title{font-size:15px;margin:0}
+    .desc{font-size:13px;color:var(--muted);margin:0}
+    .price-row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .price{font-weight:700}
+    .actions{display:flex;gap:8px}
+    .btn-ghost{background:transparent;border:1px solid #e6e9ef;padding:8px 10px;border-radius:8px;cursor:pointer}
+    .badge{background:linear-gradient(90deg,#fde68a,#fb923c);padding:6px 8px;border-radius:8px;font-size:12px}
+
+    /* Responsive tweaks using explicit breakpoints so you get 2/3/4 columns as requested */
+    @media (min-width: 1200px){
+      .products-grid{grid-template-columns: repeat(4, 1fr);}
+    }
+    @media (min-width: 900px) and (max-width:1199px){
+      .products-grid{grid-template-columns: repeat(3, 1fr);}
+    }
+    @media (min-width: 600px) and (max-width:899px){
+      .products-grid{grid-template-columns: repeat(2, 1fr);}
+    }
+    @media (max-width:599px){
+      .products-grid{grid-template-columns: 1fr;}
+      header{padding:12px}
+      .search{min-width:140px}
+    }
+
+    /* small helpers */
+    .muted{color:var(--muted);font-size:13px}
+
+    footer{padding:20px;text-align:center;color:var(--muted);font-size:13px}
+
+    /* simple modal */
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,0.45)}
+    .modal.open{display:flex}
+    .modal-card{background:#fff;padding:18px;border-radius:12px;max-width:560px;width:94%;box-shadow:var(--shadow)}
