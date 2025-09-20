@@ -1,7 +1,6 @@
 {
   "hosting": {
     "public": "public",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-    "site": "lunasbazar-74f55" 
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
   }
 }
