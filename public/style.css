@@ -10,7 +10,7 @@
     *{box-sizing:border-box}
     body{margin:0;background:#fffdf7;color:#0f172a}
 
-    header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;background:linear-gradient(60deg,#ffffff 0,#f7b166 100%);border-bottom:1px solid #e6e9ef}
+    header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;background: linear-gradient(182deg, #ff9200 0, #ffb76a 100%);;border-bottom:1px solid #e6e9ef}
     .brand{display:flex;gap:12px;align-items:center}
     .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#60a5fa);display:flex;align-items:center;justify-content:center;color:white;font-weight:700}
     h1{font-size:18px;margin:0}
@@ -23,7 +23,7 @@
     .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:12px}
     .filters{display:flex;gap:8px;align-items:center}
     .chips{display:flex;gap:8px}
-    .chip{padding:8px 12px;border-radius:999px;background:#fff;box-shadow:var(--shadow);cursor:pointer}
+    .chip{padding:8px 12px;border-radius:999px;background:#fff;box-shadow:var(--shadow);cursor:pointer;font-size: 10px;border: none;}
 
     /* Grid */
     .products-grid{
@@ -70,7 +70,7 @@
     /* simple modal */
     .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,0.45)}
     .modal.open{display:flex}
-    .modal-card{background:#fff;padding:18px;border-radius:12px;max-width:560px;width:94%;box-shadow:var(--shadow)}
+    .modal-card{background:#fff;padding:18px;border-radius:12px;max-width:560px;box-shadow:var(--shadow)}
 
         /* 🔹 Tabla dentro del modal */
     #m-extra table {
@@ -162,7 +162,7 @@
   width: 90%;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
   position: relative;
-  text-align: center;
+  /* text-align: center; */
 }
 
 /* Botón para cerrar */
@@ -228,4 +228,197 @@
 /* Ocultar elementos con clase hidden */
 .hidden {
   display: none;
+}
+
+
+
+
+/* --- Header --- */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  /* background: #fff; */
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+header h1 {
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+}
+
+header .muted {
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+header button {
+  background: #3b82f6;
+  color: #fff;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+
+header button:hover {
+  background: #2563eb;
+}
+
+/* --- Productos --- */
+
+.card img {
+  width: 100%;
+  max-height: 180px;
+  object-fit: contain;
+}
+
+.card .title {
+  font-size: 1rem;
+  font-weight: bold;
+  text-transform:uppercase;
+}
+
+.card .desc {
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+.card .price {
+  font-size: 1rem;
+  font-weight: bold;
+  margin: 6px 0;
+}
+
+.card .actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-ghost, .chip {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.btn-ghost {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.btn-ghost:hover {
+  background: #e2e8f0;
+}
+
+.chip {
+  background: #3b82f6;
+  color: white;
+}
+
+.chip:hover {
+  background: #2563eb;
+}
+
+/* --- Modal base (login, carrito, producto) --- */
+.modal, #loginModal, #cartModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 200;
+}
+
+.modal.open,
+#loginModal:not(.hidden),
+#cartModal:not(.hidden) {
+  display: flex;
+}
+
+.modal-card, .modal-content, .cart-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  position: relative;
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Botón cerrar modal */
+.close-modal, #cartClose, #m-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  border: none;
+  /* background: transparent; */
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+/* --- Carrito --- */
+.cart-content {
+  max-width: 500px;
+}
+
+#cartItems {
+  margin: 12px 0;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+#cartItems div {
+  background: #f1f5f9;
+  border-radius: 6px;
+  padding: 6px 8px;
+  margin-bottom: 6px;
+}
+
+#cartTotal {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-top: 8px;
+}
+
+#checkoutBtn {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px;
+  background: #10b981;
+  color: white;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#checkoutBtn:hover {
+  background: #059669;
+}
+
+/* --- Footer --- */
+footer {
+  text-align: center;
+  padding: 16px;
+  font-size: 0.9rem;
+  color: #64748b;
+  background: #fff;
+  border-top: 1px solid #e2e8f0;
+  margin-top: 20px;
 }

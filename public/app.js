@@ -66,7 +66,7 @@ onAuthStateChanged(auth, async (user) => {
       form.classList.remove("hidden");
       productsTable.classList.remove("hidden");
       logoutBtn.classList.remove("hidden");
-      userEmail.textContent = `Logueado como: ${user.email}`;
+      userEmail.textContent = `${user.email}`;
       resetLogoutTimer(); // iniciar temporizador
       loadProducts();
     }else{
@@ -83,10 +83,10 @@ categorySelect.addEventListener("change", () => {
   const cat = categorySelect.value;
   extraFieldsDiv.innerHTML = "";
   let fields = [];
-  if(cat === "ropa") fields = ["talla","cantidad","colores","marca","nuevoUsado"];
+  if(cat === "ropa") fields = ["talla","cantidad","colores","marca","nuevo o usado"];
   else if(cat === "zapatos") fields = ["talla","marca"];
   else if(cat === "cosmetica") fields = ["gramos","marca","ingredientes"];
-  else if(cat === "vintage") fields = ["nuevoUsado"];
+  else if(cat === "vintage") fields = ["nuevo o usado"];
   fields.forEach(f => {
     const label = document.createElement("label");
     label.textContent = f.charAt(0).toUpperCase() + f.slice(1);
@@ -109,7 +109,7 @@ function renderProducts(){
   productsTableBody.innerHTML = "";
   products.forEach(p=>{
     const tr = document.createElement("tr");
-    const extras = Object.keys(p).filter(k=>!["nombre","precio","categoria","descripcion","imagen","createdAt"].includes(k))
+    const extras = Object.keys(p).filter(k=>!["id","nombre","precio","categoria","descripcion","imagen","createdAt"].includes(k))
                           .map(k=>`${k}: ${p[k]}`).join(", ");
     tr.innerHTML = `
       <td>${p.imagen?`<img src="${p.imagen}" alt="${p.nombre}"/>`:""}</td>
@@ -195,5 +195,24 @@ form.addEventListener("submit", async e=>{
   }catch(err){
     console.error(err);
     status.textContent = "❌ Error: "+err.message;
+  }
+});
+
+
+const fileInput = document.getElementById("fileInput");
+const previewImg = document.getElementById("previewImg");
+
+fileInput.addEventListener("change", () => {
+  const file = fileInput.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      previewImg.src = e.target.result;
+      previewImg.style.display = "block"; // mostrar la imagen
+    };
+    reader.readAsDataURL(file);
+  } else {
+    previewImg.src = "";
+    previewImg.style.display = "none"; // ocultar si no hay archivo
   }
 });

@@ -18,11 +18,16 @@
   </style>
 </head>
 <body>
-  <h1>Admin - Subir/Editar Producto</h1>
+  <h1 style="justify-self: anchor-center;">Admin</h1>
+  <div style="display: flex;justify-content: flex-end;">
 
-  <button id="logoutBtn" class="hidden">Cerrar Sesión</button>
-  <p id="userEmail"></p>
-  <p id="status">Cargando...</p>
+    <p id="userEmail" style="margin: 5px;"></p>
+    <button id="logoutBtn" class="hidden" style="width:80px;font-size: 10px;padding: 0;">Cerrar Sesión</button>
+
+  </div>
+
+  <p id="status" style="justify-self: right;">Cargando...</p>
+
 
   <form id="productForm" class="hidden">
     <label>Nombre:</label>
@@ -49,6 +54,9 @@
 
     <label>Imagen:</label>
     <input type="file" id="fileInput" accept="image/*">
+    <div id="previewContainer">
+      <img id="previewImg" src="" alt="Vista previa" style="max-width:120px; margin-top:10px; display:none; border:1px solid #ccc; padding:4px;">
+    </div>
 
     <button type="submit" id="saveBtn">Guardar producto</button>
   </form>

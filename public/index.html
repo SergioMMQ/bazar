@@ -26,7 +26,7 @@
     </div>
     <div>
       <button id="openLoginBtn">Iniciar sesión</button>
-      <!-- <button id="openRegisterBtn">Registrarse</button> -->
+      <button id="openCart">🛒 Carrito</button>
     </div>
   </header>
 
@@ -96,6 +96,17 @@
       </div>
 
       <p id="status"></p>
+    </div>
+  </div>
+
+  <!-- Modal Carrito -->
+  <div id="cartModal" class="hidden">
+    <div class="modal-content">
+      <button id="cartClose">X</button>
+      <h2>Tu carrito 🛒</h2>
+      <div id="cartItems"></div>
+      <p><strong>Total: $<span id="cartTotal">0.00</span></strong></p>
+      <button id="checkoutBtn">Finalizar compra</button>
     </div>
   </div>
 
