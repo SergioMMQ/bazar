@@ -89,3 +89,143 @@
       font-weight: 600;
       width: 40%;
     }
+
+
+    .hidden {
+  display: none !important;
+}
+#loginModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#loginModal .modalContent {
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  width: 320px;
+  position: relative;
+}
+
+
+/* Estilo para el contenedor del botón */
+
+
+/* Estilo para el botón "Iniciar sesión" */
+#openLoginBtn {
+  padding: 5px 10px;
+  font-size: 16px;
+  font-weight: bold;
+  color: rgb(0, 0, 0);
+  background-color: #f5ebd1; /* Azul tipo Bootstrap */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Hover para el botón */
+#openLoginBtn:hover {
+  background-color: #b37100; /* Azul más oscuro al pasar el mouse */
+}
+
+
+
+/*  */
+
+/* Fondo del modal (pantalla oscurecida) */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Contenido del modal */
+.modal-content {
+  background-color: #fff;
+  padding: 30px 40px;
+  border-radius: 8px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  position: relative;
+  text-align: center;
+}
+
+/* Botón para cerrar */
+.close-modal {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #555;
+}
+
+/* Estilo para los encabezados */
+.modal-content h2 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Inputs */
+.modal-content input[type="email"],
+.modal-content input[type="password"] {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+/* Botones */
+.modal-content button {
+  /* width: 100%; */
+  padding: 12px;
+  background-color: #ffbf00;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.modal-content button:hover {
+  background-color: #ffbf00;
+}
+
+/* Texto de alternar login/registro */
+.modal-content p {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #555;
+}
+
+.modal-content span {
+  color: #ffbf00;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* Ocultar elementos con clase hidden */
+.hidden {
+  display: none;
+}

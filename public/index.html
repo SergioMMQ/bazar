@@ -24,6 +24,10 @@
         <input id="q" type="search" placeholder="Buscar productos..." />
       </div>
     </div>
+    <div>
+      <button id="openLoginBtn">Iniciar sesión</button>
+      <!-- <button id="openRegisterBtn">Registrarse</button> -->
+    </div>
   </header>
 
   <main>
@@ -65,6 +69,33 @@
           <button class="chip" id="m-buy">Comprar</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Modal Login/Registro -->
+  <div id="loginModal" class="hidden">
+    <div class="modal-content">
+      <button class="close-modal" id="closeModal">X</button>
+
+      <!-- Registro -->
+      <div id="registerForm">
+        <h2>Registrarse</h2>
+        <input type="email" id="regEmail" placeholder="Email">
+        <input type="password" id="regPassword" placeholder="Contraseña">
+        <button id="registerBtn">Registrarse</button>
+        <p>¿Ya tienes cuenta? <span id="switchToLogin" style="color:blue; cursor:pointer;">Iniciar sesión</span></p>
+      </div>
+
+      <!-- Login -->
+      <div id="loginForm" class="hidden">
+        <h2>Iniciar sesión</h2>
+        <input type="email" id="loginEmail" placeholder="Email">
+        <input type="password" id="loginPassword" placeholder="Contraseña">
+        <button id="loginBtn">Iniciar sesión</button>
+        <p>¿No tienes cuenta? <span id="switchToRegister" style="color:blue; cursor:pointer;">Registrarse</span></p>
+      </div>
+
+      <p id="status"></p>
     </div>
   </div>
 

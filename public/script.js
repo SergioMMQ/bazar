@@ -1,5 +1,12 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+import { 
+  getAuth, 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  signOut, 
+  onAuthStateChanged 
+} from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
 // 🔹 Configuración Firebase
 const firebaseConfig = {
@@ -14,18 +21,70 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
+// 🔹 HTML referencias
 const grid = document.getElementById('grid');
 const countEl = document.getElementById('count');
 const year = document.getElementById('year'); 
 year.textContent = new Date().getFullYear();
 
+// Modal producto
+const modal = document.getElementById('modal');
+const mTitle = document.getElementById('m-title');
+const mDesc = document.getElementById('m-desc');
+const mExtra = document.getElementById('m-extra');
+const mPrice = document.getElementById('m-price');
+const mClose = document.getElementById('m-close');
+const mImage = document.getElementById('m-image');
+
+// Login/Registro
+const openLoginBtn = document.getElementById("openLoginBtn");
+const loginModal = document.getElementById("loginModal");
+const closeModalBtn = document.getElementById("closeModal");
+
+const registerForm = document.getElementById("registerForm");
+const loginForm = document.getElementById("loginForm");
+const switchToLogin = document.getElementById("switchToLogin");
+const switchToRegister = document.getElementById("switchToRegister");
+
+const regEmail = document.getElementById("regEmail");
+const regPassword = document.getElementById("regPassword");
+const loginEmail = document.getElementById("loginEmail");
+const loginPassword = document.getElementById("loginPassword");
+
+const registerBtn = document.getElementById("registerBtn");
+const loginBtn = document.getElementById("loginBtn");
+const status = document.getElementById("status");
+
+// 🔹 Botones dinámicos
+let logoutBtn = document.getElementById("logoutBtn");
+if(!logoutBtn){
+  logoutBtn = document.createElement("button");
+  logoutBtn.id = "logoutBtn";
+  logoutBtn.textContent = "Cerrar sesión";
+  logoutBtn.style.display = "none";
+  openLoginBtn.parentNode.insertBefore(logoutBtn, openLoginBtn.nextSibling);
+}
+
+let adminBtn = document.getElementById("adminBtn");
+if(!adminBtn){
+  adminBtn = document.createElement("button");
+  adminBtn.id = "adminBtn";
+  adminBtn.textContent = "Ir a Admin";
+  adminBtn.style.display = "none";
+  logoutBtn.parentNode.insertBefore(adminBtn, logoutBtn.nextSibling);
+}
+
+// 🔹 Variables globales
+let products = [];
+
+// 🔹 Funciones
 function formatMoney(n){
   if(!n) return '';
   return Number(n).toLocaleString('es-MX',{style:'currency',currency:'MXN'});
 }
 
-// Render cards
 function render(list){
   grid.innerHTML = '';
   list.forEach(p => {
@@ -59,46 +118,26 @@ function render(list){
   countEl.textContent = list.length;
 }
 
-// 🔹 Cargar productos desde Firestore
-let products = [];
 async function loadProducts(){
   const snapshot = await getDocs(collection(db,"products"));
   products = snapshot.docs.map(doc => ({id:doc.id,...doc.data()}));
   render(products);
 }
-loadProducts();
 
-// Modal
-const modal = document.getElementById('modal');
-const mTitle = document.getElementById('m-title');
-const mDesc = document.getElementById('m-desc');
-const mExtra = document.getElementById('m-extra');
-const mPrice = document.getElementById('m-price');
-const mClose = document.getElementById('m-close');
-const mImage = document.getElementById('m-image'); // contenedor para la imagen grande
-
-function openModal(p){
+// 🔹 Modal producto
+function openProductModal(p){
   if(!p) return;
 
   mTitle.textContent = p.nombre || "Sin nombre";
-  mDesc.textContent = p.descripcion || "Sin descripción disponible";
+  mDesc.textContent = p.descripcion || "Sin descripción";
   mPrice.textContent = formatMoney(p.precio);
+  mImage.innerHTML = p.imagen ? `<img src="${p.imagen}" alt="${p.nombre}" style="width:100%; max-height:400px; object-fit:contain; margin-bottom:10px;">` : "";
 
-  // 🔹 Mostrar imagen grande
-  mImage.innerHTML = p.imagen 
-    ? `<img src="${p.imagen}" alt="${p.nombre}" style="width:100%; max-height:400px; object-fit:contain; margin-bottom:10px;">`
-    : "";
-
-  // 🔹 Mostrar detalles adicionales (tabla)
   let extras = "";
-  const keys = Object.keys(p).filter(k => 
-    !["id","nombre","descripcion","precio","imagen","categoria","createdAt"].includes(k)
-  );
+  const keys = Object.keys(p).filter(k => !["id","nombre","descripcion","precio","imagen","categoria","createdAt"].includes(k));
   if(keys.length > 0){
     extras = "<table>";
-    keys.forEach(k=>{
-      extras += `<tr><th>${k}</th><td>${p[k]}</td></tr>`;
-    });
+    keys.forEach(k=>{ extras += `<tr><th>${k}</th><td>${p[k]}</td></tr>`; });
     extras += "</table>";
   }
   mExtra.innerHTML = extras;
@@ -107,18 +146,19 @@ function openModal(p){
   modal.setAttribute('aria-hidden','false');
 }
 
-function closeModal(){ 
+function closeProductModal(){ 
   modal.classList.remove('open'); 
   modal.setAttribute('aria-hidden','true'); 
 }
 
-mClose.addEventListener('click', closeModal);
-modal.addEventListener('click', e=>{ if(e.target===modal) closeModal(); });
+mClose.addEventListener('click', closeProductModal);
+modal.addEventListener('click', e => { if(e.target===modal) closeProductModal(); });
 
-document.addEventListener('click', e=>{
+// 🔹 Eventos globales
+document.addEventListener('click', e => {
   if(e.target.matches('.btn-ghost[data-id]')){
     const id = e.target.dataset.id;
-    openModal(products.find(p=>p.id===id));
+    openProductModal(products.find(p=>p.id===id));
   }
   if(e.target.matches('[data-buy]')){
     const id = e.target.dataset.buy;
@@ -126,6 +166,7 @@ document.addEventListener('click', e=>{
   }
 });
 
+// 🔹 Buscador
 const searchInput = document.getElementById('q');
 searchInput.addEventListener('input', () => {
   const query = searchInput.value.toLowerCase();
@@ -136,3 +177,98 @@ searchInput.addEventListener('input', () => {
   );
   render(filtered);
 });
+
+// 🔹 Login/Registro funcional
+const validarEmail = email => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+const validarPassword = pass => pass.length >= 6;
+
+async function procesarBoton(botón, callback){
+  botón.disabled = true;
+  status.textContent = "Procesando...";
+  try{ await callback(); }
+  catch(err){ status.textContent = `❌ ${err.message}`; }
+  finally{ botón.disabled = false; }
+}
+
+// Abrir modal
+openLoginBtn.addEventListener('click', () => {
+  loginModal.classList.remove('hidden');
+  loginForm.classList.remove('hidden');
+  registerForm.classList.add('hidden');
+  status.textContent = "";
+});
+closeModalBtn.addEventListener('click', () => loginModal.classList.add('hidden'));
+
+// Cambiar formularios
+switchToLogin.addEventListener('click', () => {
+  loginForm.classList.remove('hidden');
+  registerForm.classList.add('hidden');
+  status.textContent = "";
+});
+switchToRegister.addEventListener('click', () => {
+  registerForm.classList.remove('hidden');
+  loginForm.classList.add('hidden');
+  status.textContent = "";
+});
+
+// Registro
+registerBtn.addEventListener('click', () => {
+  procesarBoton(registerBtn, async () => {
+    if(!validarEmail(regEmail.value)) throw new Error("Correo inválido");
+    if(!validarPassword(regPassword.value)) throw new Error("Contraseña mínima 6 caracteres");
+    const userCredential = await createUserWithEmailAndPassword(auth, regEmail.value.trim(), regPassword.value.trim());
+    status.textContent = `✅ Registrado: ${userCredential.user.email}`;
+    loginModal.classList.add('hidden');
+  });
+});
+
+// Login
+loginBtn.addEventListener('click', () => {
+  procesarBoton(loginBtn, async () => {
+    if(!validarEmail(loginEmail.value)) throw new Error("Correo inválido");
+    if(!validarPassword(loginPassword.value)) throw new Error("Contraseña mínima 6 caracteres");
+    const userCredential = await signInWithEmailAndPassword(auth, loginEmail.value.trim(), loginPassword.value.trim());
+    status.textContent = `✅ Bienvenido: ${userCredential.user.email}`;
+    loginModal.classList.add('hidden');
+  });
+});
+
+// Escuchar sesión y controlar visibilidad de botones
+onAuthStateChanged(auth, async user => {
+  if(user){
+    // Ocultar botón de login/registro
+    openLoginBtn.style.display = "none";
+    logoutBtn.style.display = "inline-block";
+
+    // Revisar si es admin
+    const token = await user.getIdTokenResult();
+    if(token.claims.admin){
+      adminBtn.style.display = "inline-block";
+    } else {
+      adminBtn.style.display = "none";
+    }
+
+  } else {
+    openLoginBtn.style.display = "inline-block";
+    logoutBtn.style.display = "none";
+    adminBtn.style.display = "none";
+  }
+});
+
+// 🔹 Cerrar sesión
+logoutBtn.addEventListener('click', async () => {
+  try{
+    await signOut(auth);
+    status.textContent = "✅ Sesión cerrada";
+  }catch(err){
+    status.textContent = `❌ Error cerrando sesión: ${err.message}`;
+  }
+});
+
+// 🔹 Ir a Admin
+adminBtn.addEventListener('click', () => {
+  window.location.href = "/admin.html";
+});
+
+// 🔹 Inicializar productos
+loadProducts();

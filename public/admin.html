@@ -9,6 +9,7 @@
     input, select, button { display: block; margin: 8px 0; width: 100%; padding: 8px; font-size: 1rem; }
     button { cursor: pointer; }
     #status { margin-top: 12px; font-weight: bold; }
+    #userEmail { margin-bottom: 12px; font-weight: bold; }
     .hidden { display: none; }
     table { width: 100%; border-collapse: collapse; margin-top: 16px; }
     th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
@@ -19,7 +20,11 @@
 <body>
   <h1>Admin - Subir/Editar Producto</h1>
 
-  <form id="productForm">
+  <button id="logoutBtn" class="hidden">Cerrar Sesión</button>
+  <p id="userEmail"></p>
+  <p id="status">Cargando...</p>
+
+  <form id="productForm" class="hidden">
     <label>Nombre:</label>
     <input type="text" id="name" required>
 
@@ -48,10 +53,8 @@
     <button type="submit" id="saveBtn">Guardar producto</button>
   </form>
 
-  <p id="status"></p>
-
   <h2>Productos existentes</h2>
-  <table id="productsTable">
+  <table id="productsTable" class="hidden">
     <thead>
       <tr>
         <th>Imagen</th>
@@ -65,163 +68,7 @@
     <tbody></tbody>
   </table>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-storage.js";
-    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+  <script type="module" src="app.js"></script>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAkLs4ELe3gxOgvJMt8vc7itOtCBZj8lvg",
-      authDomain: "lunasbazar-74f55.firebaseapp.com",
-      projectId: "lunasbazar-74f55",
-      storageBucket: "lunasbazar-74f55",
-      messagingSenderId: "763016537053",
-      appId: "1:763016537053:web:e70d665b9713bfef1b0c34",
-      measurementId: "G-YP77MN7G6D"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const storage = getStorage(app);
-    const db = getFirestore(app);
-
-    const form = document.getElementById("productForm");
-    const status = document.getElementById("status");
-    const categorySelect = document.getElementById("category");
-    const extraFieldsDiv = document.getElementById("extraFields");
-    const productsTableBody = document.querySelector("#productsTable tbody");
-    let editingId = null; // id del producto que se está editando
-    let products = [];
-
-    // Función para mostrar campos adicionales según categoría
-    categorySelect.addEventListener("change", () => {
-      const cat = categorySelect.value;
-      extraFieldsDiv.innerHTML = "";
-      let fields = [];
-      if(cat === "ropa") fields = ["talla", "cantidad", "colores", "marca", "nuevoUsado"];
-      else if(cat === "accesorios") fields = [];
-      else if(cat === "zapatos") fields = ["talla", "marca"];
-      else if(cat === "cosmetica") fields = ["gramos", "marca", "ingredientes"];
-      else if(cat === "vintage") fields = ["nuevoUsado"];
-      else if(cat === "otros") fields = [];
-
-      fields.forEach(f => {
-        const label = document.createElement("label");
-        label.textContent = f.charAt(0).toUpperCase() + f.slice(1);
-        const input = document.createElement("input");
-        input.type = "text";
-        input.id = f;
-        extraFieldsDiv.appendChild(label);
-        extraFieldsDiv.appendChild(input);
-      });
-    });
-
-    // Cargar productos
-    async function loadProducts(){
-      const snapshot = await getDocs(collection(db,"products"));
-      products = snapshot.docs.map(docSnap => ({id: docSnap.id, ...docSnap.data()}));
-      renderProducts();
-    }
-
-    function renderProducts(){
-      productsTableBody.innerHTML = "";
-      products.forEach(p => {
-        const tr = document.createElement("tr");
-        const extras = Object.keys(p).filter(k => !["nombre","precio","categoria","descripcion","imagen","createdAt"].includes(k)).map(k=>`${k}: ${p[k]}`).join(", ");
-        tr.innerHTML = `
-          <td>${p.imagen ? `<img src="${p.imagen}" alt="${p.nombre}"/>` : ""}</td>
-          <td>${p.nombre}</td>
-          <td>${p.categoria}</td>
-          <td>${p.precio}</td>
-          <td>${extras}</td>
-          <td>
-            <button data-edit="${p.id}">Editar</button>
-            <button data-delete="${p.id}">Eliminar</button>
-          </td>
-        `;
-        productsTableBody.appendChild(tr);
-      });
-    }
-
-    // Editar y eliminar
-    productsTableBody.addEventListener("click", async e => {
-      const editId = e.target.dataset.edit;
-      const deleteId = e.target.dataset.delete;
-
-      if(editId){
-        const p = products.find(x=>x.id===editId);
-        if(!p) return;
-        editingId = p.id;
-        document.getElementById("name").value = p.nombre;
-        document.getElementById("price").value = p.precio;
-        document.getElementById("desc").value = p.descripcion || "";
-        categorySelect.value = p.categoria;
-        categorySelect.dispatchEvent(new Event("change"));
-        for(const key in p){
-          const input = document.getElementById(key);
-          if(input) input.value = p[key];
-        }
-        status.textContent = `✏️ Editando producto "${p.nombre}"`;
-        window.scrollTo(0,0);
-      }
-
-      if(deleteId){
-        if(confirm("¿Eliminar este producto?")){
-          await deleteDoc(doc(db,"products",deleteId));
-          await loadProducts();
-          status.textContent = "Producto eliminado ✅";
-        }
-      }
-    });
-
-    // Guardar producto (nuevo o editar)
-    form.addEventListener("submit", async e => {
-      e.preventDefault();
-      status.textContent = "Subiendo...";
-      const name = document.getElementById("name").value;
-      const price = Number(document.getElementById("price").value);
-      const desc = document.getElementById("desc").value;
-      const cat = categorySelect.value;
-      const file = document.getElementById("fileInput").files[0];
-
-      // Recopilar campos extras
-      const extras = {};
-      extraFieldsDiv.querySelectorAll("input").forEach(input => {
-        if(input.value) extras[input.id] = input.value;
-      });
-
-      try{
-        let imageUrl = null;
-        if(file){
-          const storageRef = ref(storage, `products/${Date.now()}-${file.name}`);
-          await uploadBytes(storageRef, file);
-          imageUrl = await getDownloadURL(storageRef);
-        }
-
-        if(editingId){
-          // actualizar producto
-          const updateData = { nombre: name, precio: price, descripcion: desc, categoria: cat, ...extras };
-          if(imageUrl) updateData.imagen = imageUrl;
-          await updateDoc(doc(db,"products",editingId), updateData);
-          status.textContent = "✅ Producto actualizado con éxito";
-          editingId = null;
-        }else{
-          // crear nuevo producto
-          await addDoc(collection(db,"products"), { nombre: name, precio: price, descripcion: desc, categoria: cat, imagen: imageUrl, ...extras, createdAt: new Date() });
-          status.textContent = "✅ Producto guardado con éxito";
-        }
-
-        form.reset();
-        extraFieldsDiv.innerHTML = "";
-        await loadProducts();
-      }catch(err){
-        console.error(err);
-        status
-        .textContent = "❌ Error al guardar: " + err.message;
-      }
-    });
-
-    // Inicializar
-    loadProducts();
-  </script>
 </body>
 </html>
