@@ -112,7 +112,7 @@ function render(list){
           <div class="actions">
             <button class="btn-ghost" data-id="${p.id}" aria-label="Ver">Ver</button>
             <button class="chip" data-buy="${p.id}">Comprar</button>
-            <button class="chip addToCartBtn">Agregar al carrito</button>
+            <button class="chip addToCartBtn" data-id="${p.id}">Agregar al carrito</button>
           </div>
         </div>
       </div>
@@ -130,8 +130,8 @@ function render(list){
     });
   });
   countEl.textContent = list.length;
+  updateProductBadges();
 }
-
 
 async function loadProducts(){
   const snapshot = await getDocs(collection(db,"products"));
@@ -170,14 +170,25 @@ mClose.addEventListener('click', closeProductModal);
 modal.addEventListener('click', e => { if(e.target===modal) closeProductModal(); });
 
 // 🔹 Eventos globales
-document.addEventListener('click', e => {
-  if(e.target.matches('.btn-ghost[data-id]')){
+document.addEventListener("click", e => {
+  // Abrir modal de detalle
+  if (e.target.matches(".btn-ghost[data-id]")) {
     const id = e.target.dataset.id;
-    openProductModal(products.find(p=>p.id===id));
+    openProductModal(products.find(p => p.id === id));
   }
-  if(e.target.matches('[data-buy]')){
+
+  // Comprar directo desde el modal
+  if (e.target.matches("[data-buy]")) {
     const id = e.target.dataset.buy;
-    alert('Simulación: producto agregado al carrito -> ' + id);
+    const product = products.find(p => p.id === id);
+    if (product) {
+      addToCart({
+        id: product.id,
+        name: product.nombre,
+        price: product.precio
+      });
+      closeProductModal(); // ✅ corregido
+    }
   }
 });
 
@@ -251,18 +262,15 @@ loginBtn.addEventListener('click', () => {
 // Escuchar sesión y controlar visibilidad de botones
 onAuthStateChanged(auth, async user => {
   if(user){
-    // Ocultar botón de login/registro
     openLoginBtn.style.display = "none";
     logoutBtn.style.display = "inline-block";
 
-    // Revisar si es admin
     const token = await user.getIdTokenResult();
     if(token.claims.admin){
       adminBtn.style.display = "inline-block";
     } else {
       adminBtn.style.display = "none";
     }
-
   } else {
     openLoginBtn.style.display = "inline-block";
     logoutBtn.style.display = "none";
@@ -285,10 +293,6 @@ adminBtn.addEventListener('click', () => {
   window.location.href = "/admin.html";
 });
 
-// 🔹 Inicializar productos
-loadProducts();
-
-
 // --- Carrito ---
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
@@ -298,6 +302,12 @@ const cartClose = document.getElementById("cartClose");
 const cartItems = document.getElementById("cartItems");
 const cartTotal = document.getElementById("cartTotal");
 const checkoutBtn = document.getElementById("checkoutBtn");
+
+// 🔹 Contador del carrito
+function updateCartCount() {
+  const totalQty = cart.reduce((acc, item) => acc + item.qty, 0);
+  openCartBtn.textContent = `🛒 Carrito (${totalQty})`;
+}
 
 // Mostrar carrito
 function renderCart() {
@@ -324,6 +334,8 @@ function renderCart() {
 
   cartTotal.textContent = total.toFixed(2);
   localStorage.setItem("cart", JSON.stringify(cart));
+  updateCartCount();
+  updateProductBadges();
 }
 
 // Agregar producto al carrito
@@ -335,6 +347,21 @@ function addToCart(product) {
     cart.push({ ...product, qty: 1 });
   }
   renderCart();
+}
+
+// 🔹 Mostrar cuántas unidades en cada producto
+function updateProductBadges() {
+  document.querySelectorAll(".addToCartBtn").forEach(btn => {
+    const id = btn.dataset.id;
+    const item = cart.find(p => p.id === id);
+    if (item) {
+      btn.textContent = `En carrito (${item.qty})`;
+      btn.style.background = "#10b981"; // verde
+    } else {
+      btn.textContent = "Agregar al carrito";
+      btn.style.background = "#3b82f6"; // azul
+    }
+  });
 }
 
 // Eventos abrir/cerrar carrito
@@ -359,3 +386,8 @@ cartItems.addEventListener("click", (e) => {
 checkoutBtn.addEventListener("click", () => {
   alert("Aquí luego integramos el pago 💳");
 });
+
+// 🔹 Inicializar
+loadProducts();
+updateCartCount();
+renderCart();
