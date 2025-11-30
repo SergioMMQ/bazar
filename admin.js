@@ -34,4 +34,6 @@ async function makeAdmin(email) {
 (async () => {
   await listarUsuarios(); // Primero lista todos los usuarios
   await makeAdmin("quetzal.mq97@gmail.com"); // Descomenta y reemplaza para asignar admin
+  await makeAdmin("itzelcuaya116@gmail.com");
+  await makeAdmin("gabriela.cuaya@gmail.com");
 })();

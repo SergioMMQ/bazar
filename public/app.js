@@ -2,6 +2,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebas
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-storage.js";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+import { setDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
 
 // 🔹 Configuración Firebase
 const firebaseConfig = {
@@ -214,5 +216,47 @@ fileInput.addEventListener("change", () => {
   } else {
     previewImg.src = "";
     previewImg.style.display = "none"; // ocultar si no hay archivo
+  }
+});
+
+// -----------------------------
+//       SUBIR LOGO DEL BAZAR
+// -----------------------------
+
+const logoInput = document.getElementById("logoInput");
+const uploadLogoBtn = document.getElementById("uploadLogoBtn");
+const logoStatus = document.getElementById("logoStatus");
+
+uploadLogoBtn.addEventListener("click", async () => {
+  const file = logoInput.files[0];
+  if (!file) {
+    logoStatus.textContent = "Selecciona una imagen primero.";
+    logoStatus.style.color = "red";
+    return;
+  }
+
+  try {
+    logoStatus.textContent = "Subiendo logo...";
+    logoStatus.style.color = "black";
+
+    // 1. Subir al Storage
+    const storageRef = ref(storage, "branding/logo_bazar.jpg");
+    await uploadBytes(storageRef, file);
+
+    // 2. Obtener la URL
+    const url = await getDownloadURL(storageRef);
+
+    // 3. Guardar URL en Firestore
+    await setDoc(doc(db, "config", "branding"), {
+      logoUrl: url
+    });
+
+    logoStatus.textContent = "Logo actualizado correctamente 🎉";
+    logoStatus.style.color = "green";
+
+  } catch (error) {
+    console.error(error);
+    logoStatus.textContent = "Error al subir el logo";
+    logoStatus.style.color = "red";
   }
 });

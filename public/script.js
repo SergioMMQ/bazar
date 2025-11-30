@@ -1,12 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-import { 
-  getAuth, 
-  createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword, 
-  signOut, 
-  onAuthStateChanged 
-} from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
 
 // 🔹 Configuración Firebase
 const firebaseConfig = {
@@ -28,6 +24,22 @@ const grid = document.getElementById('grid');
 const countEl = document.getElementById('count');
 const year = document.getElementById('year'); 
 year.textContent = new Date().getFullYear();
+
+// -----------------------------
+//     MOSTRAR LOGO DINÁMICO
+// -----------------------------
+
+const logoImg = document.getElementById("logoBazar");
+
+onSnapshot(doc(db, "config", "branding"), (snap) => {
+  if (snap.exists()) {
+    const data = snap.data();
+    if (data.logoUrl) {
+      logoImg.src = data.logoUrl;
+    }
+  }
+});
+
 
 // Modal producto
 const modal = document.getElementById('modal');
