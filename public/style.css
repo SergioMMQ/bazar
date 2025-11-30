@@ -106,9 +106,7 @@ main{
     flex-direction: column;
     justify-content: space-between;
 }
-.texto-card {
-  
-}
+
 .title{font-size:15px;margin:0}
 .desc{font-size:13px;color:var(--muted);margin:0}
 .price-row{display:flex;justify-content:space-between;align-items:center;gap:8px}
