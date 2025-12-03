@@ -114,10 +114,12 @@ function renderProducts(){
     const extras = Object.keys(p).filter(k=>!["id","nombre","precio","categoria","descripcion","imagen","createdAt"].includes(k))
                           .map(k=>`${k}: ${p[k]}`).join(", ");
     tr.innerHTML = `
-      <td>${p.imagen?`<img src="${p.imagen}" alt="${p.nombre}"/>`:""}</td>
+      <td>${p.imagen ? `<img src="${p.imagen}" alt="${p.nombre}"/>` : ""}</td>
       <td>${p.nombre}</td>
       <td>${p.categoria}</td>
       <td>${p.precio}</td>
+      <td>${p.costo ?? "-"}</td>
+      <td>${p.stock ?? "-"}</td>
       <td>${extras}</td>
       <td>
         <button data-edit="${p.id}">Editar</button>
@@ -139,6 +141,8 @@ productsTableBody.addEventListener("click", async e=>{
     document.getElementById("name").value = p.nombre;
     document.getElementById("price").value = p.precio;
     document.getElementById("desc").value = p.descripcion || "";
+    document.getElementById("costPrice").value = p.costo ?? "";
+    document.getElementById("stock").value = p.stock ?? ""; 
     categorySelect.value = p.categoria;
     categorySelect.dispatchEvent(new Event("change"));
     for(const key in p){
@@ -163,6 +167,8 @@ form.addEventListener("submit", async e=>{
   status.textContent = "Subiendo...";
   const name = document.getElementById("name").value;
   const price = Number(document.getElementById("price").value);
+  const costPrice = Number(document.getElementById("costPrice").value);
+  const stock = Number(document.getElementById("stock").value);
   const desc = document.getElementById("desc").value;
   const cat = categorySelect.value;
   const file = document.getElementById("fileInput").files[0];
@@ -181,13 +187,31 @@ form.addEventListener("submit", async e=>{
     }
 
     if(editingId){
-      const updateData = { nombre: name, precio: price, descripcion: desc, categoria: cat, ...extras };
+      const updateData = { 
+        nombre: name,
+        precio: price,
+        costo: costPrice,
+        stock: stock,
+        descripcion: desc,
+        categoria: cat,
+        ...extras
+      };      
       if(imageUrl) updateData.imagen = imageUrl;
       await updateDoc(doc(db,"products",editingId), updateData);
       status.textContent = "✅ Producto actualizado";
       editingId = null;
     }else{
-      await addDoc(collection(db,"products"), { nombre: name, precio: price, descripcion: desc, categoria: cat, imagen: imageUrl, ...extras, createdAt: new Date() });
+      await addDoc(collection(db,"products"), { 
+        nombre: name,
+        precio: price,
+        costo: costPrice,
+        stock: stock,
+        descripcion: desc,
+        categoria: cat,
+        imagen: imageUrl,
+        ...extras,
+        createdAt: new Date()
+      });
       status.textContent = "✅ Producto guardado";
     }
 

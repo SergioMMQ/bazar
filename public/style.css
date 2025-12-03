@@ -1,7 +1,7 @@
 
 :root{
   --accent:#0ea5a4;
-  --card-bg: #fdf5ef;
+  --card-bg: #fff4eae0;
   --muted:#6b7280;
   --shadow: 0 6px 18px rgba(19, 24, 33, 0.08);
   --radius: 12px;
@@ -79,7 +79,7 @@ nav{
 
 main{
   padding:24px;
-  background-color: #c6f8e8;
+  background-color: #e4fff6;
   min-height:calc(100vh - 72px - 40px);
   box-sizing: border-box;
 }

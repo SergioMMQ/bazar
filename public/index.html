@@ -18,20 +18,53 @@
     </div>
   </header>
 
-  <nav>
-    <div>
-      <div class="controls">
-        <div class="search" role="search">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="margin-right:8px"><path d="M21 21l-4.35-4.35" stroke="#94a3b8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11" cy="11" r="6" stroke="#94a3b8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <input id="q" type="search" placeholder="Buscar productos..." />
-        </div>
+<nav>
+  <div>
+    <div class="controls">
+
+      <!-- FORMULARIO FALSO PARA CAPTURAR AUTO-COMPLETE -->
+      <form autocomplete="off" id="blockAutofill" onsubmit="return false" style="position:absolute;opacity:0;pointer-events:none">
+        <input type="email" name="email" autocomplete="email">
+        <input type="password" name="password" autocomplete="new-password">
+      </form>
+
+      <!-- BUSCADOR REAL -->
+      <div class="search" role="search">
+
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="margin-right:8px">
+          <path d="M21 21l-4.35-4.35" stroke="#94a3b8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="11" cy="11" r="6" stroke="#94a3b8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+
+        <input 
+          id="q"
+          placeholder="Buscar productos..."
+          type="text"
+
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="none"
+          spellcheck="false"
+
+          name=""                 
+          data-lpignore="true"    
+          data-1p-ignore="true"   
+          data-ignore="true"      
+          role="presentation"
+        >
       </div>
-      <div class="botones">
-        <button id="openLoginBtn">Iniciar sesión</button>
-        <button id="openCart">🛒</button>
-      </div>
+
     </div>
-  </nav>
+
+    <div class="botones">
+      <button id="openLoginBtn">Iniciar sesión</button>
+      <button id="openCart">🛒</button>
+    </div>
+  </div>
+</nav>
+
+
+
 
   <main>
     <div class="toolbar">

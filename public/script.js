@@ -318,7 +318,7 @@ const checkoutBtn = document.getElementById("checkoutBtn");
 // 🔹 Contador del carrito
 function updateCartCount() {
   const totalQty = cart.reduce((acc, item) => acc + item.qty, 0);
-  openCartBtn.textContent = `🛒 Carrito (${totalQty})`;
+  openCartBtn.textContent = `🛒 (${totalQty})`;
 }
 
 // Mostrar carrito
